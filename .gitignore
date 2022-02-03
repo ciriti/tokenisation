@@ -2,6 +2,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/solidity,soliditytruffle
 # Edit at https://www.toptal.com/developers/gitignore?templates=solidity,soliditytruffle
 
+.vscode/*
+
 ### Solidity ###
 # Logs
 logs
