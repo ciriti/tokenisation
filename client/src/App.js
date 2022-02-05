@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import MyToken from "./contracts/MyToken.json";
 import MyTokenSale from "./contracts/MyTokenSale.json";
+import ERC20Mintable from "./contracts/ERC20Mintable.json";
 import KycContract from "./contracts/KycContract.json";
 import MintedCrowdsale from "./contracts/MintedCrowdsale.json";
 
@@ -9,7 +10,14 @@ import getWeb3 from "./getWeb3";
 import "./App.css";
 
 class App extends Component {
-  state = { loaded: false, kycAddress: "0x123", tokenSaleAddress: "", userTokens: 0, tokenSymbol: "-" };
+  state = { 
+    loaded: false, 
+    kycAddress: "0x123", 
+    tokenSaleAddress: "", 
+    userTokens: 0, 
+    tokenSymbol: "-",
+    totalSupply: 0
+  };
 
   componentDidMount = async () => {
     try {
@@ -30,6 +38,10 @@ class App extends Component {
           MyToken.networks[this.networkId] && MyToken.networks[this.networkId].address,
         );
 
+        this.myMintableToken = new this.web3.eth.Contract(
+          ERC20Mintable.abi,
+          ERC20Mintable.networks[this.networkId] && ERC20Mintable.networks[this.networkId].address,
+        );
 
         this.myTokenSale = new this.web3.eth.Contract(
           MyTokenSale.abi,
@@ -46,7 +58,8 @@ class App extends Component {
           KycContract.networks[this.networkId] && KycContract.networks[this.networkId].address,
         );
 
-        let symbol = await this.myToken.methods.symbol().call()
+        // let symbol = await this.myToken.methods.symbol().call()
+        let symbol = await this.myMintableToken.methods.symbol().call()
 
         // Set web3, accounts, and contract to the state, and then proceed with an
         // example of interacting with the contract's methods.
@@ -71,16 +84,21 @@ class App extends Component {
   }
 
   handleBuyToken = async () => {
-    await this.myTokenSale.methods.buyTokens(this.accounts[0]).send({from: this.accounts[0], value: this.web3.utils.toWei("1", "wei")});
+    await this.mintedCrowdsale.methods.buyTokens(this.accounts[0]).send({from: this.accounts[0], value: this.web3.utils.toWei("1", "wei")});
   }
 
   updateUserTokens = async() => {
-    let userTokens = await this.myToken.methods.balanceOf(this.accounts[0]).call();
-    this.setState({userTokens: userTokens});
+    // let userTokens = await this.myToken.methods.balanceOf(this.accounts[0]).call();
+    // let totSuppl = await this.myToken.methods.totalSupply().call();
+
+    let userTokens = await this.myMintableToken.methods.balanceOf(this.accounts[0]).call();
+    let totSuppl = await this.myMintableToken.methods.totalSupply().call();
+    this.setState({userTokens: userTokens, totalSupply: totSuppl});
   }
 
   listenToTokenTransfer = async() => {
-    this.myToken.events.Transfer({to: this.accounts[0]}).on("data", this.updateUserTokens);
+    // this.myToken.events.Transfer({to: this.accounts[0]}).on("data", this.updateUserTokens);
+    this.myMintableToken.events.Transfer({to: this.accounts[0]}).on("data", this.updateUserTokens);
   }
 
   handleKycSubmit = async () => {
@@ -94,15 +112,16 @@ class App extends Component {
     }
     return (
       <div className="App">
-        <h1>Capuccino Token for StarDucks</h1>
+        <h1>Carmelo Iriti Token</h1>
 
-        <h2>Enable your account</h2>
+        {/* <h2>Enable your account</h2>
         Address to allow: <input type="text" name="kycAddress" value={this.state.kycAddress} onChange={this.handleInputChange} />
-        <button type="button" onClick={this.handleKycSubmit}>Add Address to Whitelist</button>
-        <h2>Buy Cappucino-Tokens</h2>
+        <button type="button" onClick={this.handleKycSubmit}>Add Address to Whitelist</button> */}
+        <h2>Buy CFIM</h2>
         <p>Send Ether to this address: {this.state.tokenSaleAddress}</p>
         <p>You have: {this.state.userTokens} {this.state.tokenSymbol}</p>
-        <button type="button" onClick={this.handleBuyToken}>Buy more tokens</button>
+        <button type="button" onClick={this.handleBuyToken}>Buy 1 token more</button>
+        <p>Total supply: {this.state.totalSupply}</p>
       </div>
     );
   }
