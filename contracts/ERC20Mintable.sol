@@ -12,7 +12,7 @@ import "./MinterRole.sol";
  */
 contract ERC20Mintable is ERC20, MinterRole {
 
-    constructor() ERC20("StarDucks Capu-Token", "SCT") public {
+    constructor() ERC20("Carmelo Fabio Iriti", "CFIM") public {
         _mint(msg.sender, 0);
         _setupDecimals(0);
     }
