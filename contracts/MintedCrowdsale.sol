@@ -2,7 +2,7 @@
 pragma solidity >=0.6.0;
 
 import "./Crowdsale.sol";
-import "./KycContract.sol";
+// import "./KycContract.sol";
 import "./ERC20Mintable.sol";
 
 /**
@@ -12,18 +12,18 @@ import "./ERC20Mintable.sol";
  */
 contract MintedCrowdsale is Crowdsale {
 
-    KycContract kyc;
+    // KycContract kyc;
 
     constructor(
         uint256 rate,    // rate in TKNbits
         address payable wallet,
-        IERC20 token,
-        KycContract _kyc
+        ERC20Mintable token
+        // ,KycContract _kyc
     )
         Crowdsale(rate, wallet, token)
         public
     {
-        kyc = _kyc;
+        // kyc = _kyc;
 
     }
 
@@ -33,7 +33,7 @@ contract MintedCrowdsale is Crowdsale {
      * @param tokenAmount Number of tokens to be minted
      */
     function _deliverTokens(address beneficiary, uint256 tokenAmount) internal override{
-        require(kyc.kycCompleted(msg.sender), "KYC Not completed, purchase not allowed");
+        // require(kyc.kycCompleted(msg.sender), "KYC Not completed, purchase not allowed");
         // Potentially dangerous assumption about the type of the token.
         require(
             ERC20Mintable(address(token())).mint(beneficiary, tokenAmount),

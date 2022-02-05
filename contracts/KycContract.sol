@@ -6,7 +6,9 @@ contract KycContract is Ownable {
 
     mapping(address => bool) allowed;
 
-    constructor() public {}
+    constructor(address _addr) public {
+        setKycCompleted(_addr);
+    }
 
     function setKycCompleted(address _addr) public onlyOwner {
         allowed[_addr] = true;

@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import MyToken from "./contracts/MyToken.json";
 import MyTokenSale from "./contracts/MyTokenSale.json";
 import KycContract from "./contracts/KycContract.json";
+import MintedCrowdsale from "./contracts/MintedCrowdsale.json";
+
 import getWeb3 from "./getWeb3";
 
 import "./App.css";
@@ -16,6 +18,8 @@ class App extends Component {
 
         // Use web3 to get the user's accounts.
         this.accounts = await this.web3.eth.getAccounts();
+
+        //alert(this.accounts[0])
 
         // Get the contract instance.
         //this.networkId = await this.web3.eth.net.getId(); //<<- this doesn't work with MetaMask anymore
@@ -32,6 +36,11 @@ class App extends Component {
           MyTokenSale.networks[this.networkId] && MyTokenSale.networks[this.networkId].address,
         );
 
+        this.mintedCrowdsale = new this.web3.eth.Contract(
+          MintedCrowdsale.abi,
+          MintedCrowdsale.networks[this.networkId] && MintedCrowdsale.networks[this.networkId].address,
+        );
+
         this.kycContract = new this.web3.eth.Contract(
           KycContract.abi,
           KycContract.networks[this.networkId] && KycContract.networks[this.networkId].address,
@@ -42,7 +51,7 @@ class App extends Component {
         // Set web3, accounts, and contract to the state, and then proceed with an
         // example of interacting with the contract's methods.
         this.listenToTokenTransfer();
-        this.setState({ loaded:true, tokenSaleAddress: this.myTokenSale._address, tokenSymbol: symbol }, this.updateUserTokens);
+        this.setState({ loaded:true, tokenSaleAddress: this.mintedCrowdsale._address, tokenSymbol: symbol }, this.updateUserTokens);
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
