@@ -8,7 +8,7 @@ const chai = require("./setupchai.js");
 const BN = web3.utils.BN;
 const expect = chai.expect;
 
-contract("TokenSale_0", async function(accounts) {
+contract("MintedCrowdsale_0", async function(accounts) {
     const [ deployerAccount, recipient, anotherAccount ] = accounts;
 
     it("all coins should be in the tokensale smart contract", async () => {
@@ -22,19 +22,10 @@ contract("TokenSale_0", async function(accounts) {
 
 });
 
-contract("TokenSale_1", async function(accounts) {
+contract("MintedCrowdsale_1", async function(accounts) {
     const [ deployerAccount, recipient, anotherAccount ] = accounts;
 
     const rate = new BN('1');
-
-    // beforeEach(async function () {
-    //     // this.kycContract = await KycContract.deployed()
-    //     this.token = await ERC20Mintable.new({ from: deployerAccount });
-    //     this.crowdsale = await MintedCrowdsale.new(rate, deployerAccount, this.token.address);
-    
-    //     // add the MintedCrowdsale as a minter
-    //     await this.token.addMinter(this.crowdsale.address);
-    //   });
 
     it("should be possible to buy one token by simply sending ether to the smart contract", async () => {
 
@@ -46,32 +37,20 @@ contract("TokenSale_1", async function(accounts) {
 
         expect(balanceBeforeAccount).to.be.bignumber.equal(new BN('0'));
 
-        await expect(tokenSaleInstance.buyTokens({from: recipient, value: web3.utils.toWei("10", "wei")})).to.be.rejected;
+        let oldBalanceOfRecipient = await tokenInstance.balanceOf(recipient);
+        console.log("oldBalanceOfRecipient: " + oldBalanceOfRecipient);
+
+        await expect(tokenSaleInstance.sendTransaction({from: recipient, value: web3.utils.toWei("10", "wei")})).to.be.fulfilled;
 
         let isMinter = await tokenInstance.isMinter(tokenSaleInstance.address);
         expect(isMinter).to.be.true;
         console.log("isMinter: " + isMinter);
 
+        let newBalanceOfRecipient = await tokenInstance.balanceOf(recipient);
+        console.log("newBalanceOfRecipient: " + newBalanceOfRecipient);
 
-    
+        expect(newBalanceOfRecipient).to.be.bignumber.equal(oldBalanceOfRecipient + 10);
+
     });
 
 });
-
-// contract("TokenSale", async function(accounts) {
-//     const [ deployerAccount, recipient, anotherAccount ] = accounts;
-
-//     it("there shouldnt be any coins in my account", async () => {
-//         let instance = await Token.deployed();
-//         expect(instance.balanceOf.call(deployerAccount)).to.eventually.be.a.bignumber.equal(new BN(0));
-//     });
-
-//     it("should be possible to buy a token", async () =>{
-//         let tokenInstance = await Token.deployed();
-//         let tokenSaleInstance = await TokenSale.deployed();
-//         let balanceBefore = await tokenInstance.balanceOf(deployerAccount);
-//         expect(tokenSaleInstance.sendTransaction({ from: deployerAccount, value: web3.utils.toWei("1", "wei") })).to.be.fulfilled;
-//         return expect(tokenInstance.balanceOf(deployerAccount)).to.eventually.be.a.bignumber.equal(new BN(balanceBefore));
-//     });
-
-// });
